@@ -1,68 +1,77 @@
 #include "system.hpp"
-#include "system_config.hpp"
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
+#include "platform/clock/system_clock.hpp"
+#include "platform/diagnostic/heartbeat.hpp"
+#include "platform/interrupt/interrupt.hpp"
 
 namespace
 {
-    volatile uint32_t tickMs = 0;
+    bool initialized = false;
+    bool running = false;
 }
 
-ISR(TIMER2_COMPA_vect)
+namespace dan::core
 {
-    tickMs++;
-}
-
-namespace System
-{
-    void Init()
+    void System::Initialize()
     {
-        // PC1 — выход диагностического heartbeat.
-        DDRC |=
-            (1 << SystemConfig::HeartbeatBit);
+        if (initialized)
+        {
+            return;
+        }
 
-        // Начальное состояние heartbeat — LOW.
-        PORTC &=
-            ~(1 << SystemConfig::HeartbeatBit);
+        platform::SystemClock::Initialize();
+        platform::Heartbeat::Initialize();
 
-        // Timer2:
-        // CTC mode;
-        // период системного тика — 1 мс.
-        TCCR2A = 0;
-        TCCR2B = 0;
-        TCNT2 = 0;
-
-        OCR2A =
-            SystemConfig::Timer2CompareValue;
-
-        // CTC mode: сброс Timer2 при совпадении с OCR2A.
-        TCCR2A |=
-            (1 << WGM21);
-
-        // Предделитель Timer2 = 64.
-        TCCR2B |=
-            (1 << CS22);
-
-        // Разрешаем прерывание Compare Match A.
-        TIMSK2 |=
-            (1 << OCIE2A);
-
-        sei();
+        initialized = true;
     }
 
-    uint32_t GetTickMs()
+    void System::Start()
     {
-        uint32_t value;
+        if (!initialized || running)
+        {
+            return;
+        }
 
-        const uint8_t sreg = SREG;
+        platform::SystemClock::Start();
+        platform::Interrupt::Enable();
 
-        cli();
+        running = true;
+    }
 
-        value = tickMs;
+    void System::Run()
+    {
+        if (!running)
+        {
+            return;
+        }
 
-        SREG = sreg;
+        const uint32_t currentTickMs =
+            platform::SystemClock::GetTickMs();
 
-        return value;
+        platform::Heartbeat::Update(currentTickMs);
+
+        /*
+         * В дальнейшем здесь появится вызов обработки
+         * очереди сообщений:
+         *
+         * MessageBus::Process();
+         *
+         * Пока транспорт на этом этапе не изменяем.
+         */
+    }
+
+    void System::Stop()
+    {
+        if (!running)
+        {
+            return;
+        }
+
+        platform::Interrupt::Disable();
+
+        platform::Heartbeat::Stop();
+        platform::SystemClock::Stop();
+
+        running = false;
     }
 }

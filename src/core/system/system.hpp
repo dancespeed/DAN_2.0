@@ -1,10 +1,15 @@
 #pragma once
 
-#include <stdint.h>
-
-namespace System
+namespace dan::core
 {
-    void Init();
+    class System final
+    {
+    public:
+        static void Initialize();
+        static void Start();
+        static void Run();
+        static void Stop();
 
-    uint32_t GetTickMs();
+        System() = delete;
+    };
 }
