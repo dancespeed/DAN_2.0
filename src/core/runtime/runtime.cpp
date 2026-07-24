@@ -1,9 +1,19 @@
 #include "runtime.hpp"
 
+#include "core/module/module_table.hpp"
+#include "modules/test/test_module.hpp"
+
 namespace
 {
     bool initialized = false;
     bool running = false;
+
+    dan::modules::TestModule testModule;
+
+    void RegisterModules()
+    {
+        dan::core::ModuleTable::Register(testModule);
+    }
 }
 
 namespace dan::core
@@ -15,14 +25,11 @@ namespace dan::core
             return;
         }
 
-        /*
-         * Здесь позже будут:
-         *
-         * Configuration
-         * ModuleTable
-         * MessageBus
-         * Dispatcher
-         */
+        ModuleTable::Initialize();
+
+        RegisterModules();
+
+        ModuleTable::InitializeModules();
 
         initialized = true;
     }
@@ -34,9 +41,7 @@ namespace dan::core
             return;
         }
 
-        /*
-         * Запуск Runtime.
-         */
+        ModuleTable::Start();
 
         running = true;
     }
@@ -48,12 +53,7 @@ namespace dan::core
             return;
         }
 
-        /*
-         * Позже здесь появится:
-         *
-         * MessageBus::Process();
-         * Dispatcher::Dispatch();
-         */
+        ModuleTable::Run();
     }
 
     void Runtime::Stop()
@@ -62,6 +62,8 @@ namespace dan::core
         {
             return;
         }
+
+        ModuleTable::Stop();
 
         running = false;
     }
