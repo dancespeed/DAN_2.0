@@ -1,8 +1,7 @@
 #include "system.hpp"
 
-#include "platform/clock/system_clock.hpp"
-#include "platform/diagnostic/heartbeat.hpp"
-#include "platform/interrupt/interrupt.hpp"
+#include "core/runtime/runtime.hpp"
+#include "platform/platform.hpp"
 
 namespace
 {
@@ -19,8 +18,8 @@ namespace dan::core
             return;
         }
 
-        platform::SystemClock::Initialize();
-        platform::Heartbeat::Initialize();
+        platform::Platform::Initialize();
+        Runtime::Initialize();
 
         initialized = true;
     }
@@ -32,8 +31,8 @@ namespace dan::core
             return;
         }
 
-        platform::SystemClock::Start();
-        platform::Interrupt::Enable();
+        platform::Platform::Start();
+        Runtime::Start();
 
         running = true;
     }
@@ -45,19 +44,8 @@ namespace dan::core
             return;
         }
 
-        const uint32_t currentTickMs =
-            platform::SystemClock::GetTickMs();
-
-        platform::Heartbeat::Update(currentTickMs);
-
-        /*
-         * В дальнейшем здесь появится вызов обработки
-         * очереди сообщений:
-         *
-         * MessageBus::Process();
-         *
-         * Пока транспорт на этом этапе не изменяем.
-         */
+        platform::Platform::Run();
+        Runtime::Run();
     }
 
     void System::Stop()
@@ -67,10 +55,8 @@ namespace dan::core
             return;
         }
 
-        platform::Interrupt::Disable();
-
-        platform::Heartbeat::Stop();
-        platform::SystemClock::Stop();
+        Runtime::Stop();
+        platform::Platform::Stop();
 
         running = false;
     }
