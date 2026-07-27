@@ -3,6 +3,7 @@
 #include "message.hpp"
 #include "message_bus.hpp"
 
+#include "core/diagnostics/diagnostics.hpp"
 #include "core/module/module.hpp"
 #include "core/module/module_table.hpp"
 
@@ -17,11 +18,15 @@ namespace dan::core
             return false;
         }
 
+        Diagnostics::PrintLine("[DISPATCH] Dequeue");
+
         const ModuleId receiver = MessageHeader::GetReceiver(message.header);
 
         if (receiver == MessageProtocol::Broadcast)
         {
+            Diagnostics::PrintLine("[DISPATCH] Route -> Broadcast");
             ModuleTable::ReceiveBroadcast(message);
+            Diagnostics::PrintLine("[DISPATCH] Delivered");
             return true;
         }
 
@@ -29,10 +34,16 @@ namespace dan::core
 
         if (module == nullptr)
         {
+            Diagnostics::PrintLine("[DISPATCH] Receiver not found");
             return false;
         }
 
+        Diagnostics::Print("[DISPATCH] Route -> ");
+        Diagnostics::PrintLine(module->GetName());
+
         module->Receive(message);
+
+        Diagnostics::PrintLine("[DISPATCH] Delivered");
         return true;
     }
 
