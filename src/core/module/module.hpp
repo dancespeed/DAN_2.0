@@ -21,6 +21,9 @@ namespace dan::core
         virtual ModuleId GetId() const = 0;
 
         [[nodiscard]]
+        virtual const char* GetName() const = 0;
+
+        [[nodiscard]]
         ModuleState GetState() const;
 
     protected:

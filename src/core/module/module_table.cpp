@@ -1,6 +1,7 @@
 #include "module_table.hpp"
 
 #include "core/config/runtime_config.hpp"
+#include "core/diagnostics/diagnostics.hpp"
 
 #include <stddef.h>
 
@@ -9,6 +10,7 @@ namespace
     struct ModuleEntry
     {
         dan::core::Module* module = nullptr;
+        bool runReported = false;
     };
 
     ModuleEntry modules[dan::core::config::MaxModules];
@@ -25,6 +27,7 @@ namespace dan::core
         for (ModuleEntry& entry : modules)
         {
             entry.module = nullptr;
+            entry.runReported = false;
         }
     }
 
@@ -43,6 +46,7 @@ namespace dan::core
         }
 
         modules[moduleCount].module = &module;
+        modules[moduleCount].runReported = false;
         ++moduleCount;
 
         return true;
@@ -85,6 +89,17 @@ namespace dan::core
             if (module != nullptr)
             {
                 module->Initialize();
+
+                if (module->GetState() == ModuleState::Initialized)
+                {
+                    Diagnostics::Print("[MODULE] Initialize OK: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
+                else
+                {
+                    Diagnostics::Print("[MODULE] Initialize FAILED: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
             }
         }
     }
@@ -98,6 +113,17 @@ namespace dan::core
             if (module != nullptr)
             {
                 module->Start();
+
+                if (module->GetState() == ModuleState::Running)
+                {
+                    Diagnostics::Print("[MODULE] Start OK: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
+                else
+                {
+                    Diagnostics::Print("[MODULE] Start FAILED: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
             }
         }
     }
@@ -106,11 +132,20 @@ namespace dan::core
     {
         for (size_t index = 0; index < moduleCount; ++index)
         {
-            Module* module = modules[index].module;
+            ModuleEntry& entry = modules[index];
+            Module* module = entry.module;
 
             if (module != nullptr)
             {
                 module->Run();
+
+                if (!entry.runReported &&
+                    module->GetState() == ModuleState::Running)
+                {
+                    Diagnostics::Print("[MODULE] Run: ");
+                    Diagnostics::PrintLine(module->GetName());
+                    entry.runReported = true;
+                }
             }
         }
     }
@@ -119,11 +154,24 @@ namespace dan::core
     {
         for (size_t index = moduleCount; index > 0; --index)
         {
-            Module* module = modules[index - 1].module;
+            ModuleEntry& entry = modules[index - 1];
+            Module* module = entry.module;
 
             if (module != nullptr)
             {
                 module->Stop();
+                entry.runReported = false;
+
+                if (module->GetState() == ModuleState::Stopped)
+                {
+                    Diagnostics::Print("[MODULE] Stop OK: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
+                else
+                {
+                    Diagnostics::Print("[MODULE] Stop FAILED: ");
+                    Diagnostics::PrintLine(module->GetName());
+                }
             }
         }
     }

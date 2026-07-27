@@ -12,6 +12,9 @@ namespace dan::modules
         core::ModuleId GetId() const override;
 
         [[nodiscard]]
+        const char* GetName() const override;
+
+        [[nodiscard]]
         bool HasReceivedMessage() const;
 
         [[nodiscard]]

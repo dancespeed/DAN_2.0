@@ -17,6 +17,11 @@ namespace dan::modules
         return core::ModuleIds::Test;
     }
 
+    const char* TestModule::GetName() const
+    {
+        return "TestModule";
+    }
+
     bool TestModule::HasReceivedMessage() const
     {
         return hasReceivedMessage;
