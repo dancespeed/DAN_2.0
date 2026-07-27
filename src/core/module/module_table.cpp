@@ -63,6 +63,19 @@ namespace dan::core
         return nullptr;
     }
 
+    void ModuleTable::ReceiveBroadcast(const Message& message)
+    {
+        for (size_t index = 0; index < moduleCount; ++index)
+        {
+            Module* module = modules[index].module;
+
+            if (module != nullptr)
+            {
+                module->Receive(message);
+            }
+        }
+    }
+
     void ModuleTable::InitializeModules()
     {
         for (size_t index = 0; index < moduleCount; ++index)

@@ -3,14 +3,14 @@
 #include "message.hpp"
 #include "message_bus.hpp"
 
-#include "../module/module.hpp"
-#include "../module/module_table.hpp"
+#include "core/module/module.hpp"
+#include "core/module/module_table.hpp"
 
 namespace dan::core
 {
     bool MessageDispatcher::ProcessOne()
     {
-        Message message;
+        Message message{};
 
         if (!MessageBus::Receive(message))
         {
@@ -34,5 +34,18 @@ namespace dan::core
 
         module->Receive(message);
         return true;
+    }
+
+    uint8_t MessageDispatcher::ProcessAll()
+    {
+        uint8_t processedCount = 0;
+
+        while (MessageBus::HasMessages())
+        {
+            ProcessOne();
+            ++processedCount;
+        }
+
+        return processedCount;
     }
 }

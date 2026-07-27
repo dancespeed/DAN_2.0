@@ -1,5 +1,7 @@
 #include "runtime.hpp"
 
+#include "core/message/message_bus.hpp"
+#include "core/message/message_dispatcher.hpp"
 #include "core/module/module_table.hpp"
 #include "modules/test/test_module.hpp"
 
@@ -26,6 +28,7 @@ namespace dan::core
         }
 
         ModuleTable::Initialize();
+        MessageBus::Initialize();
 
         RegisterModules();
 
@@ -53,6 +56,7 @@ namespace dan::core
             return;
         }
 
+        MessageDispatcher::ProcessAll();
         ModuleTable::Run();
     }
 

@@ -56,6 +56,11 @@ namespace dan::core
         state = ModuleState::Stopped;
     }
 
+    void Module::Receive(const Message& message)
+    {
+        OnReceive(message);
+    }
+
     ModuleState Module::GetState() const
     {
         return state;

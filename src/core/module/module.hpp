@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/message/message.hpp"
 #include "core/module/module_id.hpp"
 #include "core/module/module_state.hpp"
 
@@ -14,6 +15,7 @@ namespace dan::core
         void Start();
         void Run();
         void Stop();
+        void Receive(const Message& message);
 
         [[nodiscard]]
         virtual ModuleId GetId() const = 0;
@@ -28,6 +30,7 @@ namespace dan::core
         virtual bool OnStart() = 0;
         virtual void OnRun() = 0;
         virtual void OnStop() = 0;
+        virtual void OnReceive(const Message& message) = 0;
 
     private:
         ModuleState state = ModuleState::Stopped;
