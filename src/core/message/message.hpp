@@ -4,20 +4,37 @@
 
 namespace dan::core
 {
+    using GlobalId = uint8_t;
     using ModuleId = uint8_t;
-    using MessageType = uint8_t;
-    using MessageAttribute = uint8_t;
-    using MessageId = uint16_t;
+    using MessageId = uint8_t;
     using ObjectId = uint16_t;
     using MessageValue = uint16_t;
+
+    enum class MessageType : uint8_t
+    {
+        Command = 0x00,
+        Event = 0x01,
+        System = 0x02,
+        Reserved = 0x03
+    };
 
     namespace MessageProtocol
     {
         inline constexpr ModuleId InvalidModule = 0x00;
-        inline constexpr ModuleId Broadcast = 0xFF;
+        inline constexpr ModuleId Broadcast = 0x3F;
 
-        inline constexpr MessageType NoType = 0x00;
-        inline constexpr MessageAttribute NoAttribute = 0x00;
+        constexpr bool IsDefinedType(MessageType type)
+        {
+            return type == MessageType::Command ||
+                   type == MessageType::Event ||
+                   type == MessageType::System;
+        }
+
+        constexpr bool IsNetworkVisible(MessageType type)
+        {
+            return type == MessageType::Command ||
+                   type == MessageType::Event;
+        }
     }
 
     struct Message
@@ -29,78 +46,96 @@ namespace dan::core
 
     namespace MessageHeader
     {
-        inline constexpr uint8_t SenderShift = 24;
+        inline constexpr uint8_t MessageIdShift = 0;
+        inline constexpr uint8_t TypeShift = 8;
+        inline constexpr uint8_t SenderShift = 10;
         inline constexpr uint8_t ReceiverShift = 16;
-        inline constexpr uint8_t TypeShift = 14;
-        inline constexpr uint8_t AttributeShift = 12;
+        inline constexpr uint8_t GlobalSenderShift = 22;
+        inline constexpr uint8_t GlobalReceiverShift = 27;
 
-        inline constexpr uint32_t ModuleMask = 0x00FF;
+        inline constexpr uint32_t GlobalMask = 0x001F;
+        inline constexpr uint32_t ModuleMask = 0x003F;
         inline constexpr uint32_t TypeMask = 0x0003;
-        inline constexpr uint32_t AttributeMask = 0x0003;
-        inline constexpr uint32_t MessageIdMask = 0x0FFF;
+        inline constexpr uint32_t MessageIdMask = 0x00FF;
 
         constexpr uint32_t Create(
+            GlobalId globalSender,
+            GlobalId globalReceiver,
             ModuleId sender,
             ModuleId receiver,
             MessageType type,
-            MessageAttribute attributes,
             MessageId messageId)
         {
             return
-                (static_cast<uint32_t>(sender) << SenderShift) |
-                (static_cast<uint32_t>(receiver) << ReceiverShift) |
-                ((static_cast<uint32_t>(type) & TypeMask) << TypeShift) |
-                ((static_cast<uint32_t>(attributes) & AttributeMask) << AttributeShift) |
-                (static_cast<uint32_t>(messageId) & MessageIdMask);
+                ((static_cast<uint32_t>(globalReceiver) & GlobalMask)
+                    << GlobalReceiverShift) |
+                ((static_cast<uint32_t>(globalSender) & GlobalMask)
+                    << GlobalSenderShift) |
+                ((static_cast<uint32_t>(receiver) & ModuleMask)
+                    << ReceiverShift) |
+                ((static_cast<uint32_t>(sender) & ModuleMask)
+                    << SenderShift) |
+                ((static_cast<uint32_t>(type) & TypeMask)
+                    << TypeShift) |
+                ((static_cast<uint32_t>(messageId) & MessageIdMask)
+                    << MessageIdShift);
+        }
+
+        constexpr GlobalId GetGlobalSender(uint32_t header)
+        {
+            return static_cast<GlobalId>(
+                (header >> GlobalSenderShift) & GlobalMask
+            );
+        }
+
+        constexpr GlobalId GetGlobalReceiver(uint32_t header)
+        {
+            return static_cast<GlobalId>(
+                (header >> GlobalReceiverShift) & GlobalMask
+            );
         }
 
         constexpr ModuleId GetSender(uint32_t header)
         {
-            return static_cast<ModuleId>((header >> SenderShift) & ModuleMask);
+            return static_cast<ModuleId>(
+                (header >> SenderShift) & ModuleMask
+            );
         }
 
         constexpr ModuleId GetReceiver(uint32_t header)
         {
-            return static_cast<ModuleId>((header >> ReceiverShift) & ModuleMask);
+            return static_cast<ModuleId>(
+                (header >> ReceiverShift) & ModuleMask
+            );
         }
 
         constexpr MessageType GetType(uint32_t header)
         {
-            return static_cast<MessageType>((header >> TypeShift) & TypeMask);
-        }
-
-        constexpr MessageAttribute GetAttributes(uint32_t header)
-        {
-            return static_cast<MessageAttribute>(
-                (header >> AttributeShift) & AttributeMask
+            return static_cast<MessageType>(
+                (header >> TypeShift) & TypeMask
             );
         }
 
         constexpr MessageId GetMessageId(uint32_t header)
         {
-            return static_cast<MessageId>(header & MessageIdMask);
+            return static_cast<MessageId>(
+                (header >> MessageIdShift) & MessageIdMask
+            );
         }
 
-        constexpr bool HasAttribute(
-            uint32_t header,
-            MessageAttribute attribute)
+        constexpr bool IsValidGlobalId(GlobalId id)
         {
-            return (GetAttributes(header) & attribute) == attribute;
+            return (static_cast<uint32_t>(id) & ~GlobalMask) == 0;
+        }
+
+        constexpr bool IsValidModuleId(ModuleId id)
+        {
+            return (static_cast<uint32_t>(id) & ~ModuleMask) == 0;
         }
 
         constexpr bool IsValidType(MessageType type)
         {
             return (static_cast<uint32_t>(type) & ~TypeMask) == 0;
-        }
-
-        constexpr bool IsValidAttributes(MessageAttribute attributes)
-        {
-            return (static_cast<uint32_t>(attributes) & ~AttributeMask) == 0;
-        }
-
-        constexpr bool IsValidMessageId(MessageId messageId)
-        {
-            return (static_cast<uint32_t>(messageId) & ~MessageIdMask) == 0;
         }
     }
 

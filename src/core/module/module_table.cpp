@@ -13,6 +13,12 @@ namespace
         bool runReported = false;
     };
 
+    static_assert(
+        dan::core::config::MaxModules <=
+            static_cast<size_t>(dan::core::MessageProtocol::Broadcast - 1),
+        "MaxModules exceeds the usable six-bit ModuleId range"
+    );
+
     ModuleEntry modules[dan::core::config::MaxModules];
 
     size_t moduleCount = 0;
@@ -39,6 +45,13 @@ namespace dan::core
         }
 
         const ModuleId moduleId = module.GetId();
+
+        if (!MessageHeader::IsValidModuleId(moduleId) ||
+            moduleId == MessageProtocol::InvalidModule ||
+            moduleId == MessageProtocol::Broadcast)
+        {
+            return false;
+        }
 
         if (Find(moduleId) != nullptr)
         {

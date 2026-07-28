@@ -5,6 +5,7 @@
 
 namespace
 {
+    constexpr dan::core::GlobalId TestGlobalId = 0;
     constexpr dan::core::MessageId TestMessageId = 1;
     constexpr dan::core::ObjectId TestObjectId = 1;
     constexpr dan::core::MessageValue TestValue = 0x1234;
@@ -44,10 +45,11 @@ namespace dan::modules
         const core::Message message
         {
             core::MessageHeader::Create(
+                TestGlobalId,
+                TestGlobalId,
                 GetId(),
                 GetId(),
-                core::MessageProtocol::NoType,
-                core::MessageProtocol::NoAttribute,
+                core::MessageType::Event,
                 TestMessageId),
             TestObjectId,
             TestValue

@@ -10,6 +10,7 @@ namespace
 {
 constexpr unsigned long SerialBaudRate = 9600UL;
 
+constexpr dan::core::GlobalId Stage4GlobalId = 0;
 constexpr dan::core::MessageId Stage4MessageId = 3;
 constexpr dan::core::ObjectId Stage4ObjectId = 3;
 constexpr dan::core::MessageValue Stage4Value = 0x9ABC;
@@ -32,10 +33,11 @@ void setup()
     const dan::core::Message message
     {
         dan::core::MessageHeader::Create(
+            Stage4GlobalId,
+            Stage4GlobalId,
             dan::core::ModuleIds::Test,
             dan::core::ModuleIds::Test,
-            dan::core::MessageProtocol::NoType,
-            dan::core::MessageProtocol::NoAttribute,
+            dan::core::MessageType::Command,
             Stage4MessageId),
         Stage4ObjectId,
         Stage4Value
