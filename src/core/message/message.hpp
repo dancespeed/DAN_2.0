@@ -20,8 +20,35 @@ namespace dan::core
 
     namespace MessageProtocol
     {
+        inline constexpr GlobalId InvalidGlobal = 0x00;
+        inline constexpr GlobalId FirstDevice = 0x01;
+        inline constexpr GlobalId LastDevice = 0x1E;
+        inline constexpr GlobalId GlobalBroadcast = 0x1F;
+
         inline constexpr ModuleId InvalidModule = 0x00;
+        inline constexpr ModuleId FirstModule = 0x01;
+        inline constexpr ModuleId LastModule = 0x3E;
         inline constexpr ModuleId Broadcast = 0x3F;
+
+        constexpr bool IsDeviceId(GlobalId id)
+        {
+            return id >= FirstDevice && id <= LastDevice;
+        }
+
+        constexpr bool IsGlobalReceiver(GlobalId id)
+        {
+            return IsDeviceId(id) || id == GlobalBroadcast;
+        }
+
+        constexpr bool IsModuleSender(ModuleId id)
+        {
+            return id >= FirstModule && id <= LastModule;
+        }
+
+        constexpr bool IsModuleReceiver(ModuleId id)
+        {
+            return IsModuleSender(id) || id == Broadcast;
+        }
 
         constexpr bool IsDefinedType(MessageType type)
         {
@@ -58,6 +85,9 @@ namespace dan::core
         inline constexpr uint32_t TypeMask = 0x0003;
         inline constexpr uint32_t MessageIdMask = 0x00FF;
 
+        inline constexpr uint32_t GlobalSenderFieldMask =
+            GlobalMask << GlobalSenderShift;
+
         constexpr uint32_t Create(
             GlobalId globalSender,
             GlobalId globalReceiver,
@@ -79,6 +109,16 @@ namespace dan::core
                     << TypeShift) |
                 ((static_cast<uint32_t>(messageId) & MessageIdMask)
                     << MessageIdShift);
+        }
+
+        constexpr uint32_t SetGlobalSender(
+            uint32_t header,
+            GlobalId globalSender)
+        {
+            return
+                (header & ~GlobalSenderFieldMask) |
+                ((static_cast<uint32_t>(globalSender) & GlobalMask)
+                    << GlobalSenderShift);
         }
 
         constexpr GlobalId GetGlobalSender(uint32_t header)

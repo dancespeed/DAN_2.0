@@ -1,11 +1,11 @@
 #include "test_module.hpp"
 
-#include "core/message/message_bus.hpp"
+#include "core/config/runtime_config.hpp"
+#include "core/message/message_dispatcher.hpp"
 #include "core/module/module_ids.hpp"
 
 namespace
 {
-    constexpr dan::core::GlobalId TestGlobalId = 0;
     constexpr dan::core::MessageId TestMessageId = 1;
     constexpr dan::core::ObjectId TestObjectId = 1;
     constexpr dan::core::MessageValue TestValue = 0x1234;
@@ -45,8 +45,8 @@ namespace dan::modules
         const core::Message message
         {
             core::MessageHeader::Create(
-                TestGlobalId,
-                TestGlobalId,
+                core::MessageProtocol::InvalidGlobal,
+                core::config::LocalDeviceId,
                 GetId(),
                 GetId(),
                 core::MessageType::Event,
@@ -55,7 +55,10 @@ namespace dan::modules
             TestValue
         };
 
-        return core::MessageBus::Publish(message);
+        const core::DispatchResult result =
+            core::MessageDispatcher::SubmitLocal(message);
+
+        return result.localAccepted;
     }
 
     void TestModule::OnRun()

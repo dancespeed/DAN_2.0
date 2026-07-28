@@ -1,5 +1,6 @@
 #include "runtime.hpp"
 
+#include "core/config/runtime_config.hpp"
 #include "core/message/message_bus.hpp"
 #include "core/message/message_dispatcher.hpp"
 #include "core/module/module_table.hpp"
@@ -30,8 +31,12 @@ namespace dan::core
         ModuleTable::Initialize();
         MessageBus::Initialize();
 
-        RegisterModules();
+        if (!MessageDispatcher::Initialize(config::LocalDeviceId))
+        {
+            return;
+        }
 
+        RegisterModules();
         ModuleTable::InitializeModules();
 
         initialized = true;
@@ -40,6 +45,11 @@ namespace dan::core
     void Runtime::Start()
     {
         if (!initialized || running)
+        {
+            return;
+        }
+
+        if (!MessageDispatcher::Start())
         {
             return;
         }
@@ -68,6 +78,7 @@ namespace dan::core
         }
 
         ModuleTable::Stop();
+        MessageDispatcher::Stop();
 
         running = false;
     }
