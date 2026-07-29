@@ -2,12 +2,16 @@
 
 #include "core/message/message.hpp"
 #include "core/module/module.hpp"
+#include "core/module/module_ids.hpp"
 
 namespace dan::modules
 {
     class TestModule final : public core::Module
     {
     public:
+        inline static constexpr core::ModuleId Id =
+            core::ModuleIds::FirstApplication;
+
         [[nodiscard]]
         core::ModuleId GetId() const override;
 

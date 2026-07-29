@@ -2,7 +2,6 @@
 
 #include "core/config/runtime_config.hpp"
 #include "core/message/message_dispatcher.hpp"
-#include "core/module/module_ids.hpp"
 
 namespace
 {
@@ -15,7 +14,7 @@ namespace dan::modules
 {
     core::ModuleId TestModule::GetId() const
     {
-        return core::ModuleIds::Test;
+        return Id;
     }
 
     const char* TestModule::GetName() const

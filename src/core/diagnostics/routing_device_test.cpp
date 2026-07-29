@@ -4,8 +4,8 @@
 #include "core/diagnostics/diagnostics.hpp"
 #include "core/message/message.hpp"
 #include "core/message/message_dispatcher.hpp"
-#include "core/module/module_ids.hpp"
 #include "core/system/system.hpp"
+#include "modules/test/test_module.hpp"
 
 namespace
 {
@@ -45,8 +45,8 @@ Message CreateMessage(
         MessageHeader::Create(
             globalSender,
             globalReceiver,
-            ModuleIds::Test,
-            ModuleIds::Test,
+            dan::modules::TestModule::Id,
+            dan::modules::TestModule::Id,
             type,
             messageId),
         TestObjectId,

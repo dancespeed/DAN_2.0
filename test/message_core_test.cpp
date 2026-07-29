@@ -6,6 +6,7 @@
 #include "../src/core/message/message_dispatcher.hpp"
 #include "../src/core/message/message_queue.hpp"
 #include "../src/core/module/module.hpp"
+#include "../src/core/module/module_ids.hpp"
 #include "../src/core/module/module_table.hpp"
 #include "../src/core/network/network_transport.hpp"
 #include "../src/core/network/network_transport_config.hpp"
@@ -200,6 +201,13 @@ int main()
     static_assert(MessageProtocol::FirstModule == 0x01);
     static_assert(MessageProtocol::LastModule == 0x3E);
     static_assert(MessageProtocol::Broadcast == 0x3F);
+    static_assert(ModuleIds::FirstCore == MessageProtocol::FirstModule);
+    static_assert(
+        ModuleIds::LastApplication == MessageProtocol::LastModule
+    );
+    static_assert(
+        ModuleIds::LastApplication + 1U == MessageProtocol::Broadcast
+    );
 
     static_assert(MessageProtocol::IsDeviceId(1));
     static_assert(MessageProtocol::IsDeviceId(30));
@@ -233,8 +241,12 @@ int main()
 
     constexpr GlobalId localDeviceId = 1;
     constexpr GlobalId remoteDeviceId = 2;
-    constexpr ModuleId sourceModuleId = 1;
-    constexpr ModuleId targetModuleId = 2;
+    constexpr ModuleId sourceModuleId = ModuleIds::FirstApplication;
+    constexpr ModuleId targetModuleId =
+        static_cast<ModuleId>(ModuleIds::FirstApplication + 1U);
+
+    static_assert(ModuleIds::IsApplication(sourceModuleId));
+    static_assert(ModuleIds::IsApplication(targetModuleId));
 
     TestModule sourceModule(sourceModuleId);
     TestModule targetModule(targetModuleId);
