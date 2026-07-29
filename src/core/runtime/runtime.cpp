@@ -4,19 +4,11 @@
 #include "core/message/message_bus.hpp"
 #include "core/message/message_dispatcher.hpp"
 #include "core/module/module_table.hpp"
-#include "modules/test/test_module.hpp"
 
 namespace
 {
     bool initialized = false;
     bool running = false;
-
-    dan::modules::TestModule testModule;
-
-    void RegisterModules()
-    {
-        dan::core::ModuleTable::Register(testModule);
-    }
 }
 
 namespace dan::core
@@ -36,7 +28,6 @@ namespace dan::core
             return;
         }
 
-        RegisterModules();
         ModuleTable::InitializeModules();
 
         initialized = true;

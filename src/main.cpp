@@ -2,7 +2,6 @@
 
 #include "core/diagnostics/diagnostics.hpp"
 #include "core/system/system.hpp"
-#include "core/diagnostics/routing_device_test.hpp"
 
 namespace
 {
@@ -21,9 +20,13 @@ void setup()
     dan::core::System::Initialize();
     dan::core::System::Start();
 
+<<<<<<< HEAD
     dan::core::Diagnostics::PrintLine(F("[BOOT] System started"));
 
     dan::diagnostics::RoutingDeviceTest::Run();
+=======
+    dan::core::Diagnostics::PrintLine("[BOOT] System started");
+>>>>>>> a1b7758 (Run core without application modules)
 }
 
 void loop()
