@@ -96,33 +96,33 @@ namespace
         {
             case NetworkDispatchResult::NotRequested:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: not requested");
+                    F("[DISPATCH] Network: not requested"));
                 break;
 
             case NetworkDispatchResult::Accepted:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: accepted");
+                    F("[DISPATCH] Network: accepted"));
                 break;
 
             case NetworkDispatchResult::NoTransport:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: no transport");
+                    F("[DISPATCH] Network: no transport"));
                 break;
 
             case NetworkDispatchResult::NotReady:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: transport not ready");
+                    F("[DISPATCH] Network: transport not ready"));
                 break;
 
             case NetworkDispatchResult::QueueFull:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: queue full");
+                    F("[DISPATCH] Network: queue full"));
                 break;
 
             case NetworkDispatchResult::Rejected:
             default:
                 Diagnostics::PrintLine(
-                    "[DISPATCH] Network: rejected");
+                    F("[DISPATCH] Network: rejected"));
                 break;
         }
     }
@@ -151,7 +151,7 @@ namespace dan::core
         running = false;
         initialized = true;
 
-        Diagnostics::PrintLine("[DISPATCH] Initialized");
+        Diagnostics::PrintLine(F("[DISPATCH] Initialized"));
         return true;
     }
 
@@ -175,7 +175,7 @@ namespace dan::core
         }
 
         running = true;
-        Diagnostics::PrintLine("[DISPATCH] Started");
+        Diagnostics::PrintLine(F("[DISPATCH] Started"));
         return true;
     }
 
@@ -187,13 +187,13 @@ namespace dan::core
         }
 
         running = false;
-        Diagnostics::PrintLine("[DISPATCH] Stopped");
+        Diagnostics::PrintLine(F("[DISPATCH] Stopped"));
     }
 
     DispatchResult MessageDispatcher::SubmitLocal(
         const Message& message)
     {
-        Diagnostics::PrintLine("[DISPATCH] SubmitLocal: entered");
+        Diagnostics::PrintLine(F("[DISPATCH] SubmitLocal: entered"));
 
         DispatchResult result
         {
@@ -204,7 +204,7 @@ namespace dan::core
         if (!running)
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitLocal: rejected, dispatcher not running");
+                F("[DISPATCH] SubmitLocal: rejected, dispatcher not running"));
 
             result.networkResult = NetworkDispatchResult::Rejected;
             return result;
@@ -213,7 +213,7 @@ namespace dan::core
         if (!IsValidLocalMessage(message))
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitLocal: rejected, invalid message");
+                F("[DISPATCH] SubmitLocal: rejected, invalid message"));
 
             result.networkResult = NetworkDispatchResult::Rejected;
             return result;
@@ -227,7 +227,7 @@ namespace dan::core
         );
 
         Diagnostics::PrintLine(
-            "[DISPATCH] SubmitLocal: GlobalSender <- LocalDeviceId");
+            F("[DISPATCH] SubmitLocal: GlobalSender <- LocalDeviceId"));
 
         const GlobalId globalReceiver =
             MessageHeader::GetGlobalReceiver(routedMessage.header);
@@ -246,31 +246,31 @@ namespace dan::core
         if (requiresLocalDelivery)
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitLocal: route -> local");
+                F("[DISPATCH] SubmitLocal: route -> local"));
 
             result.localAccepted = MessageBus::Publish(routedMessage);
 
             Diagnostics::PrintLine(
                 result.localAccepted
-                    ? "[DISPATCH] SubmitLocal: local accepted"
-                    : "[DISPATCH] SubmitLocal: local rejected");
+                    ? F("[DISPATCH] SubmitLocal: local accepted")
+                    : F("[DISPATCH] SubmitLocal: local rejected"));
         }
         else
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitLocal: local not requested");
+                F("[DISPATCH] SubmitLocal: local not requested"));
         }
 
         if (!requiresNetworkDelivery)
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitLocal: network not requested");
+                F("[DISPATCH] SubmitLocal: network not requested"));
 
             return result;
         }
 
         Diagnostics::PrintLine(
-            "[DISPATCH] SubmitLocal: route -> network");
+            F("[DISPATCH] SubmitLocal: route -> network"));
 
         if (networkTransport == nullptr)
         {
@@ -290,12 +290,12 @@ namespace dan::core
 
     bool MessageDispatcher::SubmitNetwork(const Message& message)
     {
-        Diagnostics::PrintLine("[DISPATCH] SubmitNetwork: entered");
+        Diagnostics::PrintLine(F("[DISPATCH] SubmitNetwork: entered"));
 
         if (!running)
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitNetwork: rejected, dispatcher not running");
+                F("[DISPATCH] SubmitNetwork: rejected, dispatcher not running"));
 
             return false;
         }
@@ -303,26 +303,26 @@ namespace dan::core
         if (!IsValidNetworkMessage(message))
         {
             Diagnostics::PrintLine(
-                "[DISPATCH] SubmitNetwork: rejected, invalid message");
+                F("[DISPATCH] SubmitNetwork: rejected, invalid message"));
 
             return false;
         }
 
         Diagnostics::PrintLine(
-            "[DISPATCH] SubmitNetwork: accepted from network");
+            F("[DISPATCH] SubmitNetwork: accepted from network"));
 
         Diagnostics::PrintLine(
-            "[DISPATCH] SubmitNetwork: network echo blocked");
+            F("[DISPATCH] SubmitNetwork: network echo blocked"));
 
         Diagnostics::PrintLine(
-            "[DISPATCH] SubmitNetwork: route -> local");
+            F("[DISPATCH] SubmitNetwork: route -> local"));
 
         const bool accepted = MessageBus::Publish(message);
 
         Diagnostics::PrintLine(
             accepted
-                ? "[DISPATCH] SubmitNetwork: local accepted"
-                : "[DISPATCH] SubmitNetwork: local rejected");
+                ? F("[DISPATCH] SubmitNetwork: local accepted")
+                : F("[DISPATCH] SubmitNetwork: local rejected"));
 
         return accepted;
     }
@@ -336,15 +336,15 @@ namespace dan::core
             return false;
         }
 
-        Diagnostics::PrintLine("[DISPATCH] Dequeue");
+        Diagnostics::PrintLine(F("[DISPATCH] Dequeue"));
 
         const ModuleId receiver = MessageHeader::GetReceiver(message.header);
 
         if (receiver == MessageProtocol::Broadcast)
         {
-            Diagnostics::PrintLine("[DISPATCH] Route -> Broadcast");
+            Diagnostics::PrintLine(F("[DISPATCH] Route -> Broadcast"));
             ModuleTable::ReceiveBroadcast(message);
-            Diagnostics::PrintLine("[DISPATCH] Delivered");
+            Diagnostics::PrintLine(F("[DISPATCH] Delivered"));
             return true;
         }
 
@@ -352,16 +352,16 @@ namespace dan::core
 
         if (module == nullptr)
         {
-            Diagnostics::PrintLine("[DISPATCH] Receiver not found");
+            Diagnostics::PrintLine(F("[DISPATCH] Receiver not found"));
             return false;
         }
 
-        Diagnostics::Print("[DISPATCH] Route -> ");
+        Diagnostics::Print(F("[DISPATCH] Route -> "));
         Diagnostics::PrintLine(module->GetName());
 
         module->Receive(message);
 
-        Diagnostics::PrintLine("[DISPATCH] Delivered");
+        Diagnostics::PrintLine(F("[DISPATCH] Delivered"));
         return true;
     }
 

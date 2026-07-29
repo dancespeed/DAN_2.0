@@ -37,7 +37,27 @@ void Diagnostics::Print(const char* text)
     output_->print(text);
 }
 
+void Diagnostics::Print(const __FlashStringHelper* text)
+{
+    if (!enabled_ || output_ == nullptr || text == nullptr)
+    {
+        return;
+    }
+
+    output_->print(text);
+}
+
 void Diagnostics::PrintLine(const char* text)
+{
+    if (!enabled_ || output_ == nullptr || text == nullptr)
+    {
+        return;
+    }
+
+    output_->println(text);
+}
+
+void Diagnostics::PrintLine(const __FlashStringHelper* text)
 {
     if (!enabled_ || output_ == nullptr || text == nullptr)
     {

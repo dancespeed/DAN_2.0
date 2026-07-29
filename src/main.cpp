@@ -16,12 +16,12 @@ void setup()
 
     dan::core::Diagnostics::Initialize(Serial);
     dan::core::Diagnostics::Enable();
-    dan::core::Diagnostics::PrintLine("[DIAG] Routing stage start");
+    dan::core::Diagnostics::PrintLine(F("[DIAG] Routing stage start"));
 
     dan::core::System::Initialize();
     dan::core::System::Start();
 
-    dan::core::Diagnostics::PrintLine("[BOOT] System started");
+    dan::core::Diagnostics::PrintLine(F("[BOOT] System started"));
 
     dan::diagnostics::RoutingDeviceTest::Run();
 }

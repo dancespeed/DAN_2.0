@@ -15,7 +15,7 @@ namespace dan::core
     void MessageBus::Initialize()
     {
         queue.Clear();
-        Diagnostics::PrintLine("[BUS] Initialized");
+        Diagnostics::PrintLine(F("[BUS] Initialized"));
     }
 
     bool MessageBus::Publish(const Message& message)
@@ -24,8 +24,8 @@ namespace dan::core
 
         Diagnostics::PrintLine(
             published
-                ? "[BUS] Publish OK"
-                : "[BUS] Publish FAILED");
+                ? F("[BUS] Publish OK")
+                : F("[BUS] Publish FAILED"));
 
         return published;
     }
@@ -36,7 +36,7 @@ namespace dan::core
 
         if (received)
         {
-            Diagnostics::PrintLine("[BUS] Receive OK");
+            Diagnostics::PrintLine(F("[BUS] Receive OK"));
         }
 
         return received;
@@ -55,6 +55,6 @@ namespace dan::core
     void MessageBus::Clear()
     {
         queue.Clear();
-        Diagnostics::PrintLine("[BUS] Cleared");
+        Diagnostics::PrintLine(F("[BUS] Cleared"));
     }
 }

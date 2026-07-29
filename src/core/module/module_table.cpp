@@ -105,12 +105,12 @@ namespace dan::core
 
                 if (module->GetState() == ModuleState::Initialized)
                 {
-                    Diagnostics::Print("[MODULE] Initialize OK: ");
+                    Diagnostics::Print(F("[MODULE] Initialize OK: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
                 else
                 {
-                    Diagnostics::Print("[MODULE] Initialize FAILED: ");
+                    Diagnostics::Print(F("[MODULE] Initialize FAILED: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
             }
@@ -129,12 +129,12 @@ namespace dan::core
 
                 if (module->GetState() == ModuleState::Running)
                 {
-                    Diagnostics::Print("[MODULE] Start OK: ");
+                    Diagnostics::Print(F("[MODULE] Start OK: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
                 else
                 {
-                    Diagnostics::Print("[MODULE] Start FAILED: ");
+                    Diagnostics::Print(F("[MODULE] Start FAILED: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
             }
@@ -155,7 +155,7 @@ namespace dan::core
                 if (!entry.runReported &&
                     module->GetState() == ModuleState::Running)
                 {
-                    Diagnostics::Print("[MODULE] Run: ");
+                    Diagnostics::Print(F("[MODULE] Run: "));
                     Diagnostics::PrintLine(module->GetName());
                     entry.runReported = true;
                 }
@@ -177,12 +177,12 @@ namespace dan::core
 
                 if (module->GetState() == ModuleState::Stopped)
                 {
-                    Diagnostics::Print("[MODULE] Stop OK: ");
+                    Diagnostics::Print(F("[MODULE] Stop OK: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
                 else
                 {
-                    Diagnostics::Print("[MODULE] Stop FAILED: ");
+                    Diagnostics::Print(F("[MODULE] Stop FAILED: "));
                     Diagnostics::PrintLine(module->GetName());
                 }
             }

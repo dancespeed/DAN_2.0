@@ -15,7 +15,9 @@ public:
     static bool IsEnabled();
 
     static void Print(const char* text);
+    static void Print(const __FlashStringHelper* text);
     static void PrintLine(const char* text);
+    static void PrintLine(const __FlashStringHelper* text);
 
 private:
     static Stream* output_;

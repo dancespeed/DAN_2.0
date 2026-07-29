@@ -61,29 +61,29 @@ void PrintScenarioResult(uint8_t scenario, bool passed)
         case 1:
             Diagnostics::PrintLine(
                 passed
-                    ? "[TEST] Scenario 1: PASS"
-                    : "[TEST] Scenario 1: FAIL");
+                    ? F("[TEST] Scenario 1: PASS")
+                    : F("[TEST] Scenario 1: FAIL"));
             break;
 
         case 2:
             Diagnostics::PrintLine(
                 passed
-                    ? "[TEST] Scenario 2: PASS"
-                    : "[TEST] Scenario 2: FAIL");
+                    ? F("[TEST] Scenario 2: PASS")
+                    : F("[TEST] Scenario 2: FAIL"));
             break;
 
         case 3:
             Diagnostics::PrintLine(
                 passed
-                    ? "[TEST] Scenario 3: PASS"
-                    : "[TEST] Scenario 3: FAIL");
+                    ? F("[TEST] Scenario 3: PASS")
+                    : F("[TEST] Scenario 3: FAIL"));
             break;
 
         case 4:
             Diagnostics::PrintLine(
                 passed
-                    ? "[TEST] Scenario 4: PASS"
-                    : "[TEST] Scenario 4: FAIL");
+                    ? F("[TEST] Scenario 4: PASS")
+                    : F("[TEST] Scenario 4: FAIL"));
             break;
 
         default:
@@ -94,7 +94,7 @@ void PrintScenarioResult(uint8_t scenario, bool passed)
 bool RunRemoteWithoutTransportScenario()
 {
     Diagnostics::PrintLine(
-        "[TEST] Scenario 1: Remote -> NoTransport");
+        F("[TEST] Scenario 1: Remote -> NoTransport"));
 
     const Message message = CreateMessage(
         MessageProtocol::InvalidGlobal,
@@ -114,7 +114,7 @@ bool RunRemoteWithoutTransportScenario()
 bool RunLocalBroadcastScenario()
 {
     Diagnostics::PrintLine(
-        "[TEST] Scenario 2: GlobalBroadcast -> Local + NoTransport");
+        F("[TEST] Scenario 2: GlobalBroadcast -> Local + NoTransport"));
 
     const Message message = CreateMessage(
         MessageProtocol::InvalidGlobal,
@@ -137,7 +137,7 @@ bool RunLocalBroadcastScenario()
 bool RunInvalidRemoteSystemScenario()
 {
     Diagnostics::PrintLine(
-        "[TEST] Scenario 3: Remote System -> Rejected");
+        F("[TEST] Scenario 3: Remote System -> Rejected"));
 
     const Message message = CreateMessage(
         MessageProtocol::InvalidGlobal,
@@ -157,7 +157,7 @@ bool RunInvalidRemoteSystemScenario()
 bool RunIncomingBroadcastScenario()
 {
     Diagnostics::PrintLine(
-        "[TEST] Scenario 4: SubmitNetwork Broadcast -> Local, no echo");
+        F("[TEST] Scenario 4: SubmitNetwork Broadcast -> Local, no echo"));
 
     const Message message = CreateMessage(
         RemoteDeviceId,
@@ -180,10 +180,10 @@ namespace dan::diagnostics
 void RoutingDeviceTest::Run()
 {
     core::Diagnostics::PrintLine(
-        "[TEST] Routing device test: start");
+        F("[TEST] Routing device test: start"));
 
     core::Diagnostics::PrintLine(
-        "[TEST] Drain startup message");
+        F("[TEST] Drain startup message"));
     core::System::Run();
 
     const bool scenario1 = RunRemoteWithoutTransportScenario();
@@ -203,8 +203,8 @@ void RoutingDeviceTest::Run()
 
     core::Diagnostics::PrintLine(
         allPassed
-            ? "[TEST] Routing device test: 4/4 PASS"
-            : "[TEST] Routing device test: FAILED");
+            ? F("[TEST] Routing device test: 4/4 PASS")
+            : F("[TEST] Routing device test: FAILED"));
 }
 
 } // namespace dan::diagnostics
