@@ -72,6 +72,8 @@ int main()
 {
     using namespace dan;
 
+    EEPROM.Reset();
+
     modules::EepromModule unavailableEeprom;
     CaptureStream diagnostics;
 
@@ -129,6 +131,36 @@ int main()
             "Module 0x03 (EEPROM) ready\n"
         ) != std::string::npos
     );
+
+    const uint8_t written[] {0x10, 0x20, 0x30, 0x40};
+    uint8_t read[sizeof(written)] {};
+
+    assert(config::Eeprom.Write(10, written, sizeof(written)));
+    assert(EEPROM.GetUpdateCount() == sizeof(written));
+    assert(config::Eeprom.Read(10, read, sizeof(read)));
+
+    for (size_t index = 0; index < sizeof(written); ++index)
+    {
+        assert(read[index] == written[index]);
+    }
+
+    assert(config::Eeprom.Write(10, written, sizeof(written)));
+    assert(EEPROM.GetUpdateCount() == sizeof(written));
+
+    assert(!config::Eeprom.Read(0, nullptr, 1));
+    assert(!config::Eeprom.Write(0, nullptr, 1));
+    assert(!config::Eeprom.Read(0, read, 0));
+    assert(!config::Eeprom.Write(0, written, 0));
+    assert(!config::Eeprom.Read(1023, read, 2));
+    assert(!config::Eeprom.Write(1023, written, 2));
+    assert(!config::Eeprom.Read(65535, read, 2));
+    assert(!config::Eeprom.Write(65535, written, 2));
+
+    uint8_t lastByte = 0x5A;
+    assert(config::Eeprom.Write(1023, &lastByte, 1));
+    lastByte = 0;
+    assert(config::Eeprom.Read(1023, &lastByte, 1));
+    assert(lastByte == 0x5A);
 
     core::System::Run();
     core::System::Stop();

@@ -14,6 +14,22 @@ namespace dan::modules
         return "EEPROM";
     }
 
+    bool EepromModule::Read(
+        uint16_t address,
+        uint8_t* buffer,
+        uint16_t size)
+    {
+        return platform::Eeprom::Read(address, buffer, size);
+    }
+
+    bool EepromModule::Write(
+        uint16_t address,
+        const uint8_t* data,
+        uint16_t size)
+    {
+        return platform::Eeprom::Write(address, data, size);
+    }
+
     bool EepromModule::OnInitialize()
     {
         return platform::Eeprom::Initialize();
