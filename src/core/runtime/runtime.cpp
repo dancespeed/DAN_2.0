@@ -12,14 +12,33 @@ namespace
 
 namespace dan::core
 {
-    bool Runtime::Initialize(GlobalId globalId)
+    bool Runtime::Initialize(
+        GlobalId globalId,
+        Module* const* modules,
+        size_t moduleCount)
     {
         if (initialized)
         {
             return true;
         }
 
+        if (modules == nullptr && moduleCount != 0)
+        {
+            return false;
+        }
+
         ModuleTable::Initialize();
+
+        for (size_t index = 0; index < moduleCount; ++index)
+        {
+            Module* const module = modules[index];
+
+            if (module != nullptr && !ModuleTable::Register(*module))
+            {
+                return false;
+            }
+        }
+
         MessageBus::Initialize();
 
         if (!MessageDispatcher::Initialize(globalId))

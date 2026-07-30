@@ -11,7 +11,10 @@ namespace
 
 namespace dan::core
 {
-    bool System::Initialize(GlobalId globalId)
+    bool System::Initialize(
+        GlobalId globalId,
+        Module* const* modules,
+        size_t moduleCount)
     {
         if (initialized)
         {
@@ -20,7 +23,7 @@ namespace dan::core
 
         platform::Platform::Initialize();
 
-        if (!Runtime::Initialize(globalId))
+        if (!Runtime::Initialize(globalId, modules, moduleCount))
         {
             return false;
         }
