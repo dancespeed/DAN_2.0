@@ -4,34 +4,46 @@ namespace dan::core
 {
     Module::~Module() = default;
 
-    void Module::Initialize()
+    bool Module::Initialize()
     {
+        if (state == ModuleState::Initialized)
+        {
+            return true;
+        }
+
         if (state != ModuleState::Stopped)
         {
-            return;
+            return false;
         }
 
         if (!OnInitialize())
         {
-            return;
+            return false;
         }
 
         state = ModuleState::Initialized;
+        return true;
     }
 
-    void Module::Start()
+    bool Module::Start()
     {
+        if (state == ModuleState::Running)
+        {
+            return true;
+        }
+
         if (state != ModuleState::Initialized)
         {
-            return;
+            return false;
         }
 
         if (!OnStart())
         {
-            return;
+            return false;
         }
 
         state = ModuleState::Running;
+        return true;
     }
 
     void Module::Run()

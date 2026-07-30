@@ -12,11 +12,11 @@ namespace
 
 namespace dan::core
 {
-    void Runtime::Initialize(GlobalId globalId)
+    bool Runtime::Initialize(GlobalId globalId)
     {
         if (initialized)
         {
-            return;
+            return true;
         }
 
         ModuleTable::Initialize();
@@ -24,29 +24,36 @@ namespace dan::core
 
         if (!MessageDispatcher::Initialize(globalId))
         {
-            return;
+            return false;
         }
 
         ModuleTable::InitializeModules();
 
         initialized = true;
+        return true;
     }
 
-    void Runtime::Start()
+    bool Runtime::Start()
     {
-        if (!initialized || running)
+        if (running)
         {
-            return;
+            return true;
+        }
+
+        if (!initialized)
+        {
+            return false;
         }
 
         if (!MessageDispatcher::Start())
         {
-            return;
+            return false;
         }
 
         ModuleTable::Start();
 
         running = true;
+        return true;
     }
 
     void Runtime::Run()

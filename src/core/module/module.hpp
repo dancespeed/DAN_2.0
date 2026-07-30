@@ -11,8 +11,8 @@ namespace dan::core
     public:
         virtual ~Module();
 
-        void Initialize();
-        void Start();
+        bool Initialize();
+        bool Start();
         void Run();
         void Stop();
         void Receive(const Message& message);

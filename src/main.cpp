@@ -18,10 +18,15 @@ void setup()
     dan::core::Diagnostics::Enable();
     dan::core::Diagnostics::PrintLine(F("[DIAG] Routing stage start"));
 
-    dan::core::System::Initialize(dan::config::GlobalId);
-    dan::core::System::Start();
-
-    dan::core::Diagnostics::PrintLine(F("[BOOT] System started"));
+    if (dan::core::System::Initialize(dan::config::GlobalId) &&
+        dan::core::System::Start())
+    {
+        dan::core::Diagnostics::PrintLine(F("[BOOT] System started"));
+    }
+    else
+    {
+        dan::core::Diagnostics::PrintLine(F("[BOOT] System failed"));
+    }
 }
 
 void loop()

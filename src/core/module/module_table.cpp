@@ -7,6 +7,8 @@
 
 namespace
 {
+    constexpr char HexDigits[] = "0123456789ABCDEF";
+
     struct ModuleEntry
     {
         dan::core::Module* module = nullptr;
@@ -22,6 +24,31 @@ namespace
     ModuleEntry modules[dan::core::config::MaxModules];
 
     size_t moduleCount = 0;
+
+    void PrintModuleReady(const dan::core::Module& module)
+    {
+        const dan::core::ModuleId id = module.GetId();
+        const char idText[]
+        {
+            HexDigits[(id >> 4U) & 0x0FU],
+            HexDigits[id & 0x0FU],
+            '\0'
+        };
+
+        dan::core::Diagnostics::Print(F("Module 0x"));
+        dan::core::Diagnostics::Print(idText);
+
+        const char* const name = module.GetName();
+
+        if (name != nullptr && name[0] != '\0')
+        {
+            dan::core::Diagnostics::Print(F(" ("));
+            dan::core::Diagnostics::Print(name);
+            dan::core::Diagnostics::Print(F(")"));
+        }
+
+        dan::core::Diagnostics::PrintLine(F(" ready"));
+    }
 }
 
 namespace dan::core
@@ -102,17 +129,6 @@ namespace dan::core
             if (module != nullptr)
             {
                 module->Initialize();
-
-                if (module->GetState() == ModuleState::Initialized)
-                {
-                    Diagnostics::Print(F("[MODULE] Initialize OK: "));
-                    Diagnostics::PrintLine(module->GetName());
-                }
-                else
-                {
-                    Diagnostics::Print(F("[MODULE] Initialize FAILED: "));
-                    Diagnostics::PrintLine(module->GetName());
-                }
             }
         }
     }
@@ -125,17 +141,9 @@ namespace dan::core
 
             if (module != nullptr)
             {
-                module->Start();
-
-                if (module->GetState() == ModuleState::Running)
+                if (module->Start())
                 {
-                    Diagnostics::Print(F("[MODULE] Start OK: "));
-                    Diagnostics::PrintLine(module->GetName());
-                }
-                else
-                {
-                    Diagnostics::Print(F("[MODULE] Start FAILED: "));
-                    Diagnostics::PrintLine(module->GetName());
+                    PrintModuleReady(*module);
                 }
             }
         }

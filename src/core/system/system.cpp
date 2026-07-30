@@ -11,30 +11,46 @@ namespace
 
 namespace dan::core
 {
-    void System::Initialize(GlobalId globalId)
+    bool System::Initialize(GlobalId globalId)
     {
         if (initialized)
         {
-            return;
+            return true;
         }
 
         platform::Platform::Initialize();
-        Runtime::Initialize(globalId);
+
+        if (!Runtime::Initialize(globalId))
+        {
+            return false;
+        }
 
         initialized = true;
+        return true;
     }
 
-    void System::Start()
+    bool System::Start()
     {
-        if (!initialized || running)
+        if (running)
         {
-            return;
+            return true;
+        }
+
+        if (!initialized)
+        {
+            return false;
         }
 
         platform::Platform::Start();
-        Runtime::Start();
+
+        if (!Runtime::Start())
+        {
+            platform::Platform::Stop();
+            return false;
+        }
 
         running = true;
+        return true;
     }
 
     void System::Run()
