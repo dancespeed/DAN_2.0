@@ -1,6 +1,5 @@
 #include "runtime.hpp"
 
-#include "core/config/runtime_config.hpp"
 #include "core/message/message_bus.hpp"
 #include "core/message/message_dispatcher.hpp"
 #include "core/module/module_table.hpp"
@@ -13,7 +12,7 @@ namespace
 
 namespace dan::core
 {
-    void Runtime::Initialize()
+    void Runtime::Initialize(GlobalId globalId)
     {
         if (initialized)
         {
@@ -23,7 +22,7 @@ namespace dan::core
         ModuleTable::Initialize();
         MessageBus::Initialize();
 
-        if (!MessageDispatcher::Initialize(config::LocalDeviceId))
+        if (!MessageDispatcher::Initialize(globalId))
         {
             return;
         }

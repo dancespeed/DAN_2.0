@@ -1,6 +1,5 @@
 #include "test_module.hpp"
 
-#include "core/config/runtime_config.hpp"
 #include "core/message/message_dispatcher.hpp"
 
 namespace
@@ -45,7 +44,7 @@ namespace dan::modules
         {
             core::MessageHeader::Create(
                 core::MessageProtocol::InvalidGlobal,
-                core::config::LocalDeviceId,
+                core::MessageDispatcher::GetLocalDeviceId(),
                 GetId(),
                 GetId(),
                 core::MessageType::Event,

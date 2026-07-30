@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "config/device_config.hpp"
 #include "core/diagnostics/diagnostics.hpp"
 #include "core/system/system.hpp"
 
@@ -17,7 +18,7 @@ void setup()
     dan::core::Diagnostics::Enable();
     dan::core::Diagnostics::PrintLine(F("[DIAG] Routing stage start"));
 
-    dan::core::System::Initialize();
+    dan::core::System::Initialize(dan::config::GlobalId);
     dan::core::System::Start();
 
 <<<<<<< HEAD

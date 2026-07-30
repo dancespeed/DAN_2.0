@@ -11,7 +11,7 @@ namespace
 
 namespace dan::core
 {
-    void System::Initialize()
+    void System::Initialize(GlobalId globalId)
     {
         if (initialized)
         {
@@ -19,7 +19,7 @@ namespace dan::core
         }
 
         platform::Platform::Initialize();
-        Runtime::Initialize();
+        Runtime::Initialize(globalId);
 
         initialized = true;
     }

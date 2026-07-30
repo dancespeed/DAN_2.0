@@ -1,6 +1,5 @@
 #include "routing_device_test.hpp"
 
-#include "core/config/runtime_config.hpp"
 #include "core/diagnostics/diagnostics.hpp"
 #include "core/message/message.hpp"
 #include "core/message/message_dispatcher.hpp"
@@ -11,10 +10,14 @@ namespace
 {
 using namespace dan::core;
 
-constexpr GlobalId RemoteDeviceId =
-    config::LocalDeviceId == MessageProtocol::FirstDevice
+GlobalId GetRemoteDeviceId()
+{
+    return
+        MessageDispatcher::GetLocalDeviceId() ==
+            MessageProtocol::FirstDevice
         ? static_cast<GlobalId>(MessageProtocol::FirstDevice + 1U)
         : MessageProtocol::FirstDevice;
+}
 
 constexpr MessageId RemoteMessageId = 10;
 constexpr MessageId BroadcastMessageId = 11;
@@ -23,16 +26,6 @@ constexpr MessageId IncomingBroadcastMessageId = 13;
 
 constexpr ObjectId TestObjectId = 0x0100;
 constexpr MessageValue TestValue = 0xA55A;
-
-static_assert(
-    MessageProtocol::IsDeviceId(RemoteDeviceId),
-    "Routing test remote device ID must be valid"
-);
-
-static_assert(
-    RemoteDeviceId != config::LocalDeviceId,
-    "Routing test remote device ID must differ from LocalDeviceId"
-);
 
 Message CreateMessage(
     GlobalId globalSender,
@@ -98,7 +91,7 @@ bool RunRemoteWithoutTransportScenario()
 
     const Message message = CreateMessage(
         MessageProtocol::InvalidGlobal,
-        RemoteDeviceId,
+        GetRemoteDeviceId(),
         MessageType::Command,
         RemoteMessageId
     );
@@ -141,7 +134,7 @@ bool RunInvalidRemoteSystemScenario()
 
     const Message message = CreateMessage(
         MessageProtocol::InvalidGlobal,
-        RemoteDeviceId,
+        GetRemoteDeviceId(),
         MessageType::System,
         InvalidSystemMessageId
     );
@@ -160,7 +153,7 @@ bool RunIncomingBroadcastScenario()
         F("[TEST] Scenario 4: SubmitNetwork Broadcast -> Local, no echo"));
 
     const Message message = CreateMessage(
-        RemoteDeviceId,
+        GetRemoteDeviceId(),
         MessageProtocol::GlobalBroadcast,
         MessageType::Event,
         IncomingBroadcastMessageId
